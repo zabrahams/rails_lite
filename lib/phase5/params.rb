@@ -13,6 +13,7 @@ module Phase5
       @params = {}
       return unless req
       parse_www_encoded_form(req.query_string) if req.query_string
+      parse_www_encoded_form(req.body) if req.body
       @params.merge(route_params)
     end
 
@@ -35,14 +36,26 @@ module Phase5
     # { "user" => { "address" => { "street" => "main", "zip" => "89436" } } }
     def parse_www_encoded_form(www_encoded_form)
       queries = URI::decode_www_form(www_encoded_form)
+
       queries.each do |query|
-        @params[query[0]] = query[1]
+        keys = parse_key(query[0])
+        prev_level = @params
+  
+        keys.each_with_index do |key, i|
+
+          unless prev_level.keys.include?(key)
+            prev_level[key] = ( i == keys.count - 1 ? query[1] : {} )
+          end
+
+          prev_level = prev_level[key]
+        end
       end
     end
 
     # this should return an array
     # user[address][street] should return ['user', 'address', 'street']
     def parse_key(key)
+      key.split(/\]\[|\[|\]/)
     end
   end
 end

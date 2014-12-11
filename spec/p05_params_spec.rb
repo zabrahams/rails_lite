@@ -1,3 +1,4 @@
+require 'byebug'
 require 'webrick'
 require 'phase5/params'
 require 'phase5/controller_base'
