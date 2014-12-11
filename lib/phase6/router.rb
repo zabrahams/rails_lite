@@ -17,7 +17,13 @@ module Phase6
     # use pattern to pull out route params (save for later?)
     # instantiate controller and call controller action
     def run(req, res)
-      controller = @controller_class.new(req, res)
+      route_params = {}
+      param_match = @pattern.match(req.path)
+      param_match.names.each do |name|
+          route_params[name] = param_match[name]
+      end
+
+      controller = @controller_class.new(req, res, route_params)
       controller.invoke_action(@action_name)
     end
   end
@@ -31,12 +37,13 @@ module Phase6
 
     # simply adds a new route to the list of routes
     def add_route(pattern, method, controller_class, action_name)
-      routes << Route.new(pattern, method, controller_class, action_name)
+      @routes << Route.new(pattern, method, controller_class, action_name)
     end
 
     # evaluate the proc in the context of the instance
     # for syntactic sugar :)
     def draw(&proc)
+      self.instance_eval(&proc)
     end
 
     # make each of these methods that
@@ -58,7 +65,7 @@ module Phase6
     # either throw 404 or call run on a matched route
     def run(req, res)
       route = match(req)
-      route ? route.run : res.status = 404
+      route ? route.run(req, res) : res.status = 404
     end
   end
 end

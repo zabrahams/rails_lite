@@ -26,8 +26,8 @@ module Phase2
     def render_content(content, type)
       raise "Already Rendered" if already_built_response?
       @already_built_response = true
-      @res['Content-Type'] = type
-      @res.body = content
+      res['Content-Type'] = type
+      res.body = content
     end
   end
 end

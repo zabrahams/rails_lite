@@ -10,11 +10,10 @@ module Phase5
     # You haven't done routing yet; but assume route params will be
     # passed in as a hash to `Params.new` as below:
     def initialize(req, route_params = {})
-      @params = {}
+      @params = route_params
       return unless req
       parse_www_encoded_form(req.query_string) if req.query_string
       parse_www_encoded_form(req.body) if req.body
-      @params.merge(route_params)
     end
 
     def [](key)
@@ -40,7 +39,7 @@ module Phase5
       queries.each do |query|
         keys = parse_key(query[0])
         prev_level = @params
-  
+
         keys.each_with_index do |key, i|
 
           unless prev_level.keys.include?(key)
