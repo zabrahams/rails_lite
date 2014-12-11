@@ -13,7 +13,10 @@ module Phase3
         )
       template = ERB.new(template_str)
 
-      render_content(template.result(binding), "text/html")
+
+      context = binding
+      context.local_variable_set('flash', flash.now)
+      render_content(template.result(context), "text/html")
     end
   end
 
